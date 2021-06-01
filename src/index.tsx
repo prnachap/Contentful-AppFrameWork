@@ -1,17 +1,27 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom";
+import { FieldExtensionSDK, init, locations } from "@contentful/app-sdk";
+import "@contentful/forma-36-react-components/dist/styles.css";
+import { EntryField } from "./pages";
+if (process.env.NODE_ENV === "development" && window.self === window.top) {
+  // You can remove this if block before deploying your app
+  const root = document.getElementById("root");
+  ReactDOM.render(<div>Cannot Run Outside Contentful App</div>, root);
+} else {
+  init((sdk) => {
+    const root = document.getElementById("root");
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+    const ComponentLocationSettings = [
+      {
+        location: locations.LOCATION_ENTRY_FIELD,
+        component: <EntryField sdk={sdk as FieldExtensionSDK} />,
+      },
+    ];
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+    ComponentLocationSettings.forEach((componentLocationSetting) => {
+      if (sdk.location.is(componentLocationSetting.location)) {
+        ReactDOM.render(componentLocationSetting.component, root);
+      }
+    });
+  });
+}
